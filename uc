@@ -1254,7 +1254,7 @@ do
 	--
 	function Library:Watermark(Properties)
 		local Watermark = {
-			Name = (Properties.Name or Properties.name or "watermark text | placeholder");
+			Name = (idkD");
 		}
 		--
 		local Outline = Instance.new("Frame")
