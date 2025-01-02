@@ -4058,3 +4058,6 @@ do
 		return notification
 	end
 end
+
+
+local Window = Library:Window({})
