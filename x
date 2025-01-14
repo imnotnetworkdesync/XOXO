@@ -96,42 +96,35 @@ local round = function(number,float)
     return float * math.floor(number / float)
 end
 
-do
-	getsynasset = getcustomasset or getsynasset
-	Font = setreadonly(Font, false);
-	function Font:Register(Name, Weight, Style, Asset)
-		if not isfile(Name .. ".font") then
-			if not isfile(Asset.Id) then
-				writefile(Asset.Id, Asset.Font);
-			end;
-			--
-			local Data = {
-				name = Name,
-				faces = {{
-					name = "Regular",
-					weight = Weight,
-					style = Style,
-					assetId = getsynasset(Asset.Id);
-				}}
-			};
-			--
-			writefile(Name .. ".font", game:GetService("HttpService"):JSONEncode(Data));
-			return getsynasset(Name .. ".font");
-		else 
-			warn("Font already registered");
-		end;
-	end;
-	--
-	function Font:GetRegistry(Name)
-		if isfile(Name .. ".font") then
-			return getsynasset(Name .. ".font");
-		end;
-	end;
+-- Dependencies and Font Setup
+local Library = Library or {}
+Library.Fonts = Library.Fonts or {}
+Library.Fonts.Menu = Library.Fonts.Menu or {}
+Library.Fonts.Types = Library.Fonts.Types or {}
 
-	Font:Register("menu_plex", 400, "normal", {Id = "ProggyTiny.ttf", Font = ""});
+function Library.Fonts.Menu:Register_Font(Name, Weight, Style, Asset)
+    if not isfile(Asset.Id) then writefile(Asset.Id, Asset.Font) end
+    if isfile(Name .. ".font") then delfile(Name .. ".font") end
+    local Data = {
+        name = Name,
+        faces = {
+            {
+                name = "Regular",
+                weight = Weight,
+                style = Style,
+                assetId = getcustomasset(Asset.Id),
+            },
+        },
+    }
+    writefile(Name .. ".font", game:GetService("HttpService"):JSONEncode(Data))
+    return getcustomasset(Name .. ".font")
 end
 
-local realfont = Font.new(Font:GetRegistry("menu_plex"))
+Library.Fonts.Types.ProggyTiny = Font.new(Library.Fonts.Menu:Register_Font("ProggyTiny", 200, "normal", {
+    Id = "ProggyTiny.ttf",
+    Font = "custom",
+}))
+
 
 local function NewInstance(Class, Properties)
     local NewInstance = INew(Class)
@@ -204,7 +197,7 @@ function Library:Notify(options)
         BorderSizePixel = 0;
         Position = UDim2.new(0, 5, 0, 0);
         Size = UDim2.new(0, 0, 0, 17);
-        FontFace =realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = Notification.Name;
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -311,7 +304,7 @@ function Library:Watermark(options)
         BorderSizePixel = 0;
         Position = UDim2.new(0, 5, 0, 0);
         Size = UDim2.new(1, 0, 1, 0);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = Watermark.Name;
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -414,7 +407,7 @@ function Library:Window(options)
         Position = UDim2.new(0, 0, 0, -10);
         Size = UDim2.new(1, 0, 0, 20);
         ZIndex = 5;
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = Window.Name;
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -555,7 +548,7 @@ function Library:Tab(options)
         BorderSizePixel = 0;
         Size = UDim2.new(0, 200, 0, 20);
         AutoButtonColor = false;
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = Tab.Name;
         TextColor3 = Color3.fromRGB(175, 175, 175);
         TextSize = 9.000;
@@ -710,7 +703,7 @@ function Library.tabs:Section(options)
         BorderSizePixel = 0;
         Position = UDim2.new(0, 5, 0, 2);
         Size = UDim2.new(1, 0, 0, 15);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = Section.Name;
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -804,7 +797,7 @@ function Library.tabs:MultiSection(options)
             BorderColor3 = Color3.fromRGB(0, 0, 0);
             BorderSizePixel = 0;
             Size = UDim2.new(1, 0, 1, 0);
-            FontFace = realfont;
+            FontFace = Library.Fonts.Types.ProggyTiny;
             Text = Value;
             TextColor3 = Color3.fromRGB(175, 175, 175);
             TextSize = 9;
@@ -934,7 +927,7 @@ function Library.sections:Toggle(options)
         BorderSizePixel = 0;
         Position = UDim2.new(0, 20, 0, 0);
         Size = UDim2.new(1, 0, 1, 0);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = Toggle.Name;
         TextColor3 = Color3.fromRGB(185, 185, 185);
         TextSize = 9.000;
@@ -1318,7 +1311,7 @@ function Library.sections:Toggle(options)
             Position = UDim2.new(1, 0, 0, 0);
             Size = UDim2.new(0, 15, 0, 15);
             AutoButtonColor = false;
-            FontFace = realfont;
+            FontFace = Library.Fonts.Types.ProggyTiny;
             Text = "[ None ]";
             TextColor3 = Color3.fromRGB(255, 255, 255);
             TextSize = 9.000;
@@ -1526,7 +1519,7 @@ function Library.sections:Button(options)
         BorderColor3 = Color3.fromRGB(0, 0, 0);
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 1, 0);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = Button.Name;
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -1586,7 +1579,7 @@ function Library.sections:Slider(options)
         BorderColor3 = Color3.fromRGB(0, 0, 0);
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 0, 13);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = Slider.Name;
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -1650,7 +1643,7 @@ function Library.sections:Slider(options)
         BorderColor3 = Color3.fromRGB(0, 0, 0);
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 1, 0);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = "50";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -1667,7 +1660,7 @@ function Library.sections:Slider(options)
         BorderSizePixel = 0;
         Position = UDim2.new(1, 0, 0, 0);
         Size = UDim2.new(0, 15, 0, 15);
-        FontFace =realfont;
+        FontFace =Library.Fonts.Types.ProggyTiny;
         Text = "+";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -1685,7 +1678,7 @@ function Library.sections:Slider(options)
         BorderSizePixel = 0;
         Position = UDim2.new(1, -15, 0, 0);
         Size = UDim2.new(0, 15, 0, 15);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = "-";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -1813,7 +1806,7 @@ function Library.sections:Dropdown(options)
         BorderColor3 = Color3.fromRGB(0, 0, 0);
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 1, 0);
-        FontFace =realfont;
+        FontFace =Library.Fonts.Types.ProggyTiny;
         Text = Dropdown.Name;
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -1864,7 +1857,7 @@ function Library.sections:Dropdown(options)
         BorderSizePixel = 0;
         Position = UDim2.new(1, 0, 0, 0);
         Size = UDim2.new(1, 0, 0, 15);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = "+";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -1881,7 +1874,7 @@ function Library.sections:Dropdown(options)
         BorderSizePixel = 0;
         Position = UDim2.new(0, 5, 0, 0);
         Size = UDim2.new(1, -20, 1, 0);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = "dropdown";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -2015,7 +2008,7 @@ function Library.sections:Dropdown(options)
                 BorderColor3 = Color3.fromRGB(0, 0, 0);
                 BorderSizePixel = 0;
                 Size = UDim2.new(1, 0, 1, 0);
-                FontFace = realfont;
+                FontFace = Library.Fonts.Types.ProggyTiny;
                 Text = option;
                 TextColor3 = Color3.fromRGB(175, 175, 175);
                 TextSize = 9.000;
@@ -2149,7 +2142,7 @@ function Library.sections:Colorpicker(options)
         BorderColor3 = Color3.fromRGB(0, 0, 0);
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 1, 0);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = Colorpicker.Name;
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -2503,7 +2496,7 @@ function Library.sections:Keybind(options)
         BorderColor3 = Color3.fromRGB(0, 0, 0);
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 1, 0);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = Keybind.Name;
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -2522,7 +2515,7 @@ function Library.sections:Keybind(options)
         Position = UDim2.new(1, 0, 0, 0);
         Size = UDim2.new(0, 15, 0, 15);
         AutoButtonColor = false;
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = "[ None ]";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -2706,7 +2699,7 @@ function Library.sections:Textbox(Options)
         BorderSizePixel = 0;
         Position = UDim2.new(0, 1, 0, 1);
         Size = UDim2.new(1, -2, 1, -2);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         PlaceholderText = Textbox.Placeholder;
         Text = "pro hax";
         TextColor3 = Color3.fromRGB(255, 255, 255);
@@ -2722,7 +2715,7 @@ function Library.sections:Textbox(Options)
         BorderColor3 = Color3.fromRGB(0, 0, 0);
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 1, 0);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = Textbox.Name;
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -2779,7 +2772,7 @@ function Library.sections:Listbox(options)
         BorderColor3 = Color3.fromRGB(0, 0, 0);
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 0, 15);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = Listbox.Name;
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -2869,7 +2862,7 @@ function Library.sections:Listbox(options)
                 BorderColor3 = Color3.fromRGB(0, 0, 0);
                 BorderSizePixel = 0;
                 Size = UDim2.new(1, 0, 1, 0);
-                FontFace =realfont;
+                FontFace =Library.Fonts.Types.ProggyTiny;
                 Text = option;
                 TextColor3 = Color3.fromRGB(255, 255, 255);
                 TextSize = 9.000;
@@ -3048,7 +3041,7 @@ function Library.tabs:PlayerList(options)
         BorderSizePixel = 0;
         Position = UDim2.new(0, 5, 0, 0);
         Size = UDim2.new(1, 0, 0, 20);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = "Name";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -3093,7 +3086,7 @@ function Library.tabs:PlayerList(options)
         BorderSizePixel = 0;
         Position = UDim2.new(0, 5, 0, 0);
         Size = UDim2.new(1, 0, 0, 20);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = "Status";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -3147,7 +3140,7 @@ function Library.tabs:PlayerList(options)
         BorderSizePixel = 0;
         Position = UDim2.new(0, 83, 1, -60);
         Size = UDim2.new(0, 200, 0, 15);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = "No player selected";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -3165,7 +3158,7 @@ function Library.tabs:PlayerList(options)
         BorderSizePixel = 0;
         Position = UDim2.new(0, 83, 1, -45);
         Size = UDim2.new(0, 200, 0, 15);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = "";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -3183,7 +3176,7 @@ function Library.tabs:PlayerList(options)
         BorderSizePixel = 0;
         Position = UDim2.new(0, 83, 1, -30);
         Size = UDim2.new(0, 200, 0, 15);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = "";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -3237,7 +3230,7 @@ function Library.tabs:PlayerList(options)
         BorderColor3 = Color3.fromRGB(0, 0, 0);
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 1, 0);
-        FontFace = realfont;
+        FontFace = Library.Fonts.Types.ProggyTiny;
         Text = "Prioritize";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -3290,7 +3283,7 @@ function Library.tabs:PlayerList(options)
         BorderColor3 = Color3.fromRGB(0, 0, 0);
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 1, 0);
-        FontFace =realfont;
+        FontFace =Library.Fonts.Types.ProggyTiny;
         Text = "Friendly";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -3343,7 +3336,7 @@ function Library.tabs:PlayerList(options)
         BorderColor3 = Color3.fromRGB(0, 0, 0);
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 1, 0);
-        FontFace =realfont;
+        FontFace =Library.Fonts.Types.ProggyTiny;
         Text = "Friend";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -3396,7 +3389,7 @@ function Library.tabs:PlayerList(options)
         BorderColor3 = Color3.fromRGB(0, 0, 0);
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 1, 0);
-        FontFace =realfont;
+        FontFace =Library.Fonts.Types.ProggyTiny;
         Text = "Enemy";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -3413,7 +3406,7 @@ function Library.tabs:PlayerList(options)
         BorderSizePixel = 0;
         Position = UDim2.new(0, 83, 1, -15);
         Size = UDim2.new(0, 200, 0, 15);
-        FontFace =realfont;
+        FontFace =Library.Fonts.Types.ProggyTiny;
         Text = "";
         TextColor3 = Color3.fromRGB(255, 255, 255);
         TextSize = 9.000;
@@ -3485,7 +3478,7 @@ function Library.tabs:PlayerList(options)
                 BorderSizePixel = 0;
                 Position = UDim2.new(0, 7, 0, 0);
                 Size = UDim2.new(0.5, 0, 1, 0);
-                FontFace = realfont;
+                FontFace = Library.Fonts.Types.ProggyTiny;
                 Text = option.Name;
                 TextColor3 = Color3.fromRGB(255, 255, 255);
                 TextSize = 9.000;
@@ -3504,7 +3497,7 @@ function Library.tabs:PlayerList(options)
                 BorderSizePixel = 0;
                 Position = UDim2.new(1, 7, 0, 0);
                 Size = UDim2.new(0.5, 0, 1, 0);
-                FontFace =realfont;
+                FontFace =Library.Fonts.Types.ProggyTiny;
                 Text = "None";
                 TextColor3 = Color3.fromRGB(255, 255, 255);
                 TextSize = 9.000;
